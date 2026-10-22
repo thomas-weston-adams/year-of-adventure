@@ -3,7 +3,7 @@
 // Until it's set, the form says RSVPs aren't open yet instead of failing.
 const FORM_ENDPOINT = "";
 // Your own profile/booking links. Leave "" to hide the button.
-const STRAVA_URL = "";
+const STRAVA_URL = "https://strava.app.link/KvabRccdW0b";
 const CALENDAR_URL = "";
 // The first day of the running streak counts as day 1.
 const STREAK_START = "2018-10-15";
