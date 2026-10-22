@@ -4,7 +4,8 @@
  * Runs on Tommy's Google account as a web app. For each request it:
  *   1. adds a row to this spreadsheet,
  *   2. emails Tommy the details (hit Reply to answer the person directly),
- *   3. emails the person a short confirmation.
+ *   3. emails the person a confirmation: everything they sent, plus a
+ *      tentative calendar event (Google Calendar link and .ics file).
  *
  * Setup and redeploy steps are in the repo's README.
  */
@@ -20,42 +21,49 @@ const SETTINGS = {
   sendConfirmation: true,
   confirmFromName: "Tommy",
   confirmSubject: "Got your request. Anything but mid.",
-  // {name}, {start}, and {end} are filled in. Keep this free of links:
-  // anyone can type any address into the form, so this email should never
-  // ask a stranger to do anything.
-  confirmBody: [
+  // {name} is filled in. The summary of their request and the calendar
+  // links go between confirmIntro and confirmOutro.
+  confirmIntro: [
     "Hi {name},",
     "",
-    "Thank you. I got your request for {start} to {end}.",
+    "Thank you. I got your request. This isn't a booking yet: I read every request myself, and I'll write back to you personally to work out the details.",
     "",
-    "This isn't a booking yet. I read every request myself, and I'll write back to you personally to work out the details.",
-    "",
+    "Here's what you sent:",
+  ].join("\n"),
+  confirmOutro: [
     "Anything but mid,",
     "Tommy",
     "",
     "(If you didn't fill out a form on my site, someone used your address by mistake. You can ignore this email.)",
   ].join("\n"),
 
+  // The calendar event they can add while they wait to hear back.
+  calendarTitle: "Tentative: Adventure with Tommy",
+  calendarNote: "Not confirmed yet. Tommy will reply personally to lock in the details.",
+
   // One confirmation per email address in this many minutes, so the form
   // can't be used to flood someone's inbox.
   confirmCooldownMinutes: 60,
+  // Free-text answers are shortened to this many characters in the
+  // confirmation (the sheet and Tommy's email keep them whole).
+  confirmMaxTextLength: 500,
 };
 // ===========================================================================
 
-// Sheet columns, in order. The left value is the form field's name="".
+// One line per form field: [name="" in the form, sheet header, label in the confirmation].
 const COLUMNS = [
-  ["submitted_at", "Submitted"],
-  ["name", "Name"],
-  ["email", "Email"],
-  ["phone", "Phone"],
-  ["relationship", "How they know Tommy"],
-  ["start_date", "Start"],
-  ["end_date", "End"],
-  ["dates_flexible", "Flexible?"],
-  ["adventure", "Adventure"],
-  ["group_size", "People"],
-  ["notes", "Notes"],
-  ["status", "Status (mine)"],
+  ["submitted_at", "Submitted", null],
+  ["name", "Name", "Name"],
+  ["email", "Email", "Email"],
+  ["phone", "Phone", "Phone"],
+  ["relationship", "How they know Tommy", "How you know Tommy"],
+  ["start_date", "Start", "Preferred start"],
+  ["end_date", "End", "Preferred end"],
+  ["dates_flexible", "Flexible?", "Dates flexible?"],
+  ["adventure", "Adventure", "Adventure"],
+  ["group_size", "People", "How many people"],
+  ["notes", "Notes", "Anything else"],
+  ["status", "Status (mine)", null],
 ];
 
 const MAX_FIELD_LENGTH = 2000;
@@ -122,7 +130,7 @@ function safeCell(value) {
 
 function notifyTommy(d) {
   const lines = COLUMNS
-    .filter(([key]) => !["submitted_at", "status"].includes(key))
+    .filter(([, , label]) => label)
     .map(([key, header]) => `${header}: ${d[key] || "—"}`);
   MailApp.sendEmail({
     to: Session.getEffectiveUser().getEmail(),
@@ -132,26 +140,129 @@ function notifyTommy(d) {
   });
 }
 
+// ---- Confirmation ---------------------------------------------------------
+
 function confirm(d) {
   const cache = CacheService.getScriptCache();
   const key = "sent:" + d.email.toLowerCase();
   if (cache.get(key)) return;
   if (MailApp.getRemainingDailyQuota() < 5) return; // leave room for Tommy's own notices
+
+  // What they sent, blanks left out, dates written out, long text shortened.
+  const rows = COLUMNS
+    .filter(([key, , label]) => label && d[key])
+    .map(([key, , label]) => {
+      let value = d[key];
+      if (key === "start_date" || key === "end_date") value = longDate(value);
+      else if (value.length > SETTINGS.confirmMaxTextLength) value = value.slice(0, SETTINGS.confirmMaxTextLength) + "…";
+      return [label, value];
+    });
+
+  const intro = SETTINGS.confirmIntro.replace("{name}", d.name.split(/\s+/)[0].slice(0, 40));
+  const calUrl = googleCalendarUrl(d);
+  const calLine = "Add it to your calendar as tentative until we confirm:";
+
+  const body = [
+    intro,
+    "",
+    rows.map(([label, value]) => `${label}: ${value}`).join("\n"),
+    "",
+    calLine,
+    `Google Calendar: ${calUrl}`,
+    "Apple, Outlook, or other calendars: open the attached .ics file.",
+    "",
+    SETTINGS.confirmOutro,
+  ].join("\n");
+
+  const htmlBody = [
+    paragraphs(intro),
+    '<table cellpadding="6" style="border-collapse:collapse;margin:8px 0 16px">',
+    rows.map(([label, value]) =>
+      `<tr><td style="vertical-align:top;color:#5d5260;white-space:nowrap"><b>${esc(label)}</b></td>` +
+      `<td style="vertical-align:top">${esc(value).replace(/\n/g, "<br>")}</td></tr>`).join(""),
+    "</table>",
+    `<p>${esc(calLine)}</p>`,
+    `<p><a href="${esc(calUrl)}" style="display:inline-block;background:#c2185b;color:#fff;padding:10px 18px;border-radius:999px;text-decoration:none;font-weight:bold">Add to Google Calendar</a></p>`,
+    "<p>Apple, Outlook, or other calendars: open the attached .ics file.</p>",
+    paragraphs(SETTINGS.confirmOutro),
+  ].join("\n");
+
   MailApp.sendEmail({
     to: d.email,
     name: SETTINGS.confirmFromName,
     subject: SETTINGS.confirmSubject,
-    body: SETTINGS.confirmBody
-      .replace("{name}", d.name.split(/\s+/)[0].slice(0, 40))
-      .replace("{start}", longDate(d.start_date))
-      .replace("{end}", longDate(d.end_date)),
+    body,
+    htmlBody,
+    attachments: [Utilities.newBlob(icsFile(d), "text/calendar", "adventure-with-tommy.ics")],
   });
   cache.put(key, "1", SETTINGS.confirmCooldownMinutes * 60);
+}
+
+// Calendar text: their adventure plus the "not confirmed" note.
+function eventDetails(d) {
+  const adventure = d.adventure.slice(0, SETTINGS.confirmMaxTextLength);
+  return `${SETTINGS.calendarNote}\n\nAdventure: ${adventure}`;
+}
+
+// All-day event from start to end. Calendars treat the end date as
+// exclusive, so the event runs to the day after end_date.
+function googleCalendarUrl(d) {
+  return "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+    "&text=" + encodeURIComponent(SETTINGS.calendarTitle) +
+    "&dates=" + compact(d.start_date) + "/" + compact(addDay(d.end_date)) +
+    "&details=" + encodeURIComponent(eventDetails(d));
+}
+
+function icsFile(d) {
+  const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
+  const text = (s) => s.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+  return [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Anything But Midlife Crisis//Requests//EN",
+    "METHOD:PUBLISH",
+    "BEGIN:VEVENT",
+    `UID:${Utilities.getUuid()}@anythingbutmidlifecrisis`,
+    `DTSTAMP:${stamp}`,
+    `DTSTART;VALUE=DATE:${compact(d.start_date)}`,
+    `DTEND;VALUE=DATE:${compact(addDay(d.end_date))}`,
+    `SUMMARY:${text(SETTINGS.calendarTitle)}`,
+    `DESCRIPTION:${text(eventDetails(d))}`,
+    "STATUS:TENTATIVE",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].map(fold).join("\r\n");
+}
+
+// Calendar files wrap lines at 75 characters; continuation lines start with a space.
+function fold(line) {
+  const parts = [];
+  for (let i = 0; i < line.length; i += i === 0 ? 75 : 74) parts.push(line.slice(i, i + (i === 0 ? 75 : 74)));
+  return parts.join("\r\n ");
+}
+
+// ---- Small helpers --------------------------------------------------------
+
+function addDay(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d + 1)).toISOString().slice(0, 10);
+}
+
+function compact(iso) {
+  return iso.replace(/-/g, "");
 }
 
 function longDate(iso) {
   const [y, m, d] = iso.split("-").map(Number);
   return Utilities.formatDate(new Date(y, m - 1, d, 12), Session.getScriptTimeZone(), "MMMM d, yyyy");
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function paragraphs(text) {
+  return text.split(/\n\n+/).map((p) => `<p>${esc(p).replace(/\n/g, "<br>")}</p>`).join("\n");
 }
 
 function reply(obj) {

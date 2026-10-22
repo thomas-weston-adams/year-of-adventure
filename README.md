@@ -23,7 +23,7 @@ Requests go to a small Google Apps Script running on Tommy's Google account
 
 1. adds a row to a Google Sheet,
 2. emails Tommy the details (hit **Reply** to answer the person directly),
-3. emails the person a short confirmation.
+3. emails the person a confirmation: everything they sent, plus a tentative calendar event (a Google Calendar link and an `.ics` file for Apple/Outlook).
 
 It's free. Gmail allows about 100 emails a day from a script.
 
