@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Year of Adventure</title>
+  <meta name="description" content="Instead of gifts, I want your time. Spend part of 2027 with me.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#rsvp">Skip to the RSVP form</a>
+
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">2027 · The Birthday Initiative</p>
+      <h1>A Year of <span class="accent">Adventure</span></h1>
+      <p class="lede">
+        Instead of gifts, I want your time. Spend some of 2027 with me, from a
+        dinner at home to a trip overseas. Pick what fits your life and your budget.
+      </p>
+      <a class="button" href="#rsvp">RSVP</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="section" aria-labelledby="options-title">
+      <div class="wrap">
+        <h2 id="options-title">Pick your adventure</h2>
+        <p class="sub">
+          Each one is marked by how much it asks of you, from 1 (low-key) to 4
+          (expedition). Open any card for the details.
+        </p>
+        <ul class="cards" id="cards"></ul>
+      </div>
+    </section>
+
+    <section class="section rsvp" id="rsvp" aria-labelledby="rsvp-title">
+      <div class="wrap narrow">
+        <h2 id="rsvp-title">Join me</h2>
+        <p class="sub">Tell me what sounds good. I'll reach out to set dates.</p>
+
+        <form id="rsvp-form" novalidate>
+          <div class="field">
+            <label for="name">Your name</label>
+            <input id="name" name="name" type="text" autocomplete="name" required>
+          </div>
+
+          <div class="field">
+            <label for="contact">Email or phone number</label>
+            <input id="contact" name="contact" type="text" autocomplete="email" required>
+          </div>
+
+          <fieldset class="field">
+            <legend>Best way to reach you</legend>
+            <div class="choices">
+              <label><input type="checkbox" name="reach" value="Text"> Text</label>
+              <label><input type="checkbox" name="reach" value="Email"> Email</label>
+              <label><input type="checkbox" name="reach" value="Phone call"> Phone call</label>
+            </div>
+          </fieldset>
+
+          <div class="row">
+            <div class="field">
+              <label for="who">Who's coming?</label>
+              <select id="who" name="who">
+                <option>Just me</option>
+                <option>Me and a partner</option>
+                <option>My family</option>
+                <option>A group</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="size">How many people, counting you?</label>
+              <input id="size" name="size" type="number" min="1" max="30" value="1" inputmode="numeric">
+            </div>
+          </div>
+
+          <fieldset class="field">
+            <legend>Which adventures interest you?</legend>
+            <div class="choices" id="activity-choices"></div>
+          </fieldset>
+
+          <div class="field">
+            <label class="inline"><input type="checkbox" name="host" value="Yes"> I'd like to host you at my place</label>
+          </div>
+
+          <div class="field">
+            <label for="teach">Something you could teach me <span class="optional">(optional)</span></label>
+            <input id="teach" name="teach" type="text">
+          </div>
+
+          <div class="field">
+            <label for="project">A project we could finish together <span class="optional">(optional)</span></label>
+            <textarea id="project" name="project" rows="3"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="trip">Pitch me a trip overseas <span class="optional">(optional)</span></label>
+            <textarea id="trip" name="trip" rows="3"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="notes">Anything else <span class="optional">(optional)</span></label>
+            <textarea id="notes" name="notes" rows="3"></textarea>
+          </div>
+
+          <!-- Spam trap: people never see this, bots fill it in. -->
+          <input type="text" name="_gotcha" class="trap" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+          <p class="status" id="status" role="status" aria-live="polite"></p>
+          <button class="button" type="submit">Send my RSVP</button>
+        </form>
+
+        <div class="thanks" id="thanks" hidden tabindex="-1">
+          <h3>Got it. Thank you.</h3>
+          <p>I'll be in touch to set dates. I'm glad you're in.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p>Running streak: day <span id="streak-day">…</span> and counting.</p>
+    </div>
+  </footer>
+
+  <dialog id="detail" aria-labelledby="detail-title">
+    <form method="dialog" class="close-row">
+      <button class="close" aria-label="Close">×</button>
+    </form>
+    <p class="effort" id="detail-effort"></p>
+    <h3 id="detail-title"></h3>
+    <div id="detail-body"></div>
+    <p id="detail-link"></p>
+    <button class="button" id="detail-rsvp" type="button">I'm in. Take me to the RSVP</button>
+  </dialog>
+</body>
+</html>
