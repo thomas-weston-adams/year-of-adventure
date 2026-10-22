@@ -1,6 +1,6 @@
 // Settings live in config.js. This file reads them; don't edit values here.
 
-const EFFORT = { 1: "Low-key", 2: "Active", 3: "Committed", 4: "Expedition" };
+const EFFORT = { 1: "Easy", 2: "Active", 3: "Gritty", 4: "Epic" };
 
 const activities = [
   {
@@ -94,6 +94,25 @@ for (const el of document.querySelectorAll("[data-date=start]")) el.textContent 
 for (const el of document.querySelectorAll("[data-date=end]")) el.textContent = longDate(CONFIG.endDate);
 for (const el of document.querySelectorAll("[data-date=earliest]")) el.textContent = longDate(earliest);
 
+// ---- Countdown to 45 and Instagram links --------------------------------
+
+{
+  const [y, m, d] = CONFIG.endDate.split("-").map(Number);
+  const birthday = new Date(y, m - 1, d);
+  const now = new Date();
+  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const days = Math.round((birthday - todayMidnight) / 86400000);
+  if (days > 0) {
+    $("countdown").textContent = days.toLocaleString();
+    $("countdown-label").textContent = days === 1 ? "day until 45" : "days until 45";
+  } else {
+    $("countdown").textContent = "45";
+    $("countdown-label").textContent = days === 0 ? "today. Happy birthday to me." : "and still anything but mid";
+  }
+}
+
+for (const id of ["handle", "follow", "footer-ig"]) $(id).href = CONFIG.instagramUrl;
+
 // ---- Cards & detail dialog ----------------------------------------------
 
 const cards = $("cards");
@@ -116,6 +135,7 @@ cards.addEventListener("click", (e) => {
   if (!button) return;
   current = activities.find((a) => a.id === button.dataset.id);
   $("detail-effort").textContent = `${current.effort} · ${EFFORT[current.effort]}`;
+  $("detail-effort").className = `effort effort-${current.effort}`;
   $("detail-title").textContent = current.title;
   $("detail-body").innerHTML = current.body.map((p) => `<p>${p}</p>`).join("");
   const link = current.link && current.link();

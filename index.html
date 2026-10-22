@@ -3,8 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>The Year of Adventure</title>
-  <meta name="description" content="Instead of gifts, I want your time. Request time with me, January 2027 through my 45th birthday.">
+  <title>Anything But Midlife Crisis</title>
+  <meta name="description" content="Epic things before 45, with the people I love. Instead of gifts, I want your time.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap">
   <link rel="stylesheet" href="styles.css">
   <script src="config.js" defer></script>
   <script src="script.js" defer></script>
@@ -14,25 +17,36 @@
 
   <header class="hero">
     <div class="wrap">
-      <p class="eyebrow">Counting down to 45</p>
-      <h1>The Year of <span class="accent">Adventure</span></h1>
+      <a class="handle" id="handle" href="https://www.instagram.com/anythingbutmidlifecrisis/" target="_blank" rel="noopener">@anythingbutmidlifecrisis</a>
+      <h1>
+        <span class="h1-top">Anything but</span>
+        <span class="h1-mid gradient-text">MID</span>
+        <span class="h1-tail">life crisis</span>
+      </h1>
       <p class="lede">
-        Instead of gifts, I want your time. From <span data-date="start">January 1, 2027</span>
-        to my 45th birthday on <span data-date="end">February 20, 2028</span>, let's do
-        something together: a dinner at home, a run, a trip overseas. Pick what
-        fits your life and your budget.
+        Some people hit 45 and buy a sports car. I'd rather spend the run-up doing
+        <strong>epic things with the people I love</strong>. Instead of gifts, I want your time,
+        from <span data-date="start">January 1, 2027</span> to my 45th birthday on
+        <span data-date="end">February 20, 2028</span>.
       </p>
-      <a class="button" href="#request">Request time with me</a>
+      <p class="countdown">
+        <span class="countdown-number gradient-text" id="countdown">…</span>
+        <span class="countdown-label" id="countdown-label">days until 45</span>
+      </p>
+      <div class="actions">
+        <a class="button" href="#request">Request time with me</a>
+        <a class="button ghost" id="follow" href="https://www.instagram.com/anythingbutmidlifecrisis/" target="_blank" rel="noopener">Follow along</a>
+      </div>
     </div>
   </header>
 
   <main>
     <section class="section" aria-labelledby="options-title">
       <div class="wrap">
-        <h2 id="options-title">Pick your adventure</h2>
+        <h2 id="options-title">The before-45 list</h2>
         <p class="sub">
-          Each one is marked by how much it asks of you, from 1 (low-key) to 4
-          (expedition). Open any card for the details.
+          Pick one, or pick a few. Each is rated by how much it asks of you, from
+          1 (easy) to 4 (epic). Open any card for the details.
         </p>
         <ul class="cards" id="cards"></ul>
       </div>
@@ -40,7 +54,7 @@
 
     <section class="section rsvp" id="request" aria-labelledby="request-title">
       <div class="wrap narrow">
-        <h2 id="request-title">Request a reservation</h2>
+        <h2 id="request-title">Claim your adventure</h2>
         <p class="sub">
           This is a request, not a booking. I read every one and reply to you
           myself. Choose dates between <span data-date="earliest">January 1, 2027</span>
@@ -131,6 +145,7 @@
   <footer class="footer">
     <div class="wrap">
       <p>Running streak: day <span id="streak-day">…</span> and counting.</p>
+      <p>Follow along on Instagram: <a id="footer-ig" href="https://www.instagram.com/anythingbutmidlifecrisis/" target="_blank" rel="noopener">@anythingbutmidlifecrisis</a></p>
     </div>
   </footer>
 

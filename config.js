@@ -23,6 +23,9 @@ const CONFIG = {
   // (A custom page needs a paid Formspree plan.)
   redirectUrl: "",
 
+  // Instagram profile: the handle badge, "Follow along" button, and footer.
+  instagramUrl: "https://www.instagram.com/anythingbutmidlifecrisis/",
+
   // Buttons on the activity cards. "" hides the button.
   stravaUrl: "https://strava.app.link/KvabRccdW0b",
   calendarUrl: "",
