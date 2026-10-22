@@ -3,23 +3,26 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>A Year of Adventure</title>
-  <meta name="description" content="Instead of gifts, I want your time. Spend part of 2027 with me.">
+  <title>The Year of Adventure</title>
+  <meta name="description" content="Instead of gifts, I want your time. Request time with me, January 2027 through my 45th birthday.">
   <link rel="stylesheet" href="styles.css">
+  <script src="config.js" defer></script>
   <script src="script.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#rsvp">Skip to the RSVP form</a>
+  <a class="skip" href="#request">Skip to the request form</a>
 
   <header class="hero">
     <div class="wrap">
-      <p class="eyebrow">2027 · The Birthday Initiative</p>
-      <h1>A Year of <span class="accent">Adventure</span></h1>
+      <p class="eyebrow">Counting down to 45</p>
+      <h1>The Year of <span class="accent">Adventure</span></h1>
       <p class="lede">
-        Instead of gifts, I want your time. Spend some of 2027 with me, from a
-        dinner at home to a trip overseas. Pick what fits your life and your budget.
+        Instead of gifts, I want your time. From <span data-date="start">January 1, 2027</span>
+        to my 45th birthday on <span data-date="end">February 20, 2028</span>, let's do
+        something together: a dinner at home, a run, a trip overseas. Pick what
+        fits your life and your budget.
       </p>
-      <a class="button" href="#rsvp">RSVP</a>
+      <a class="button" href="#request">Request time with me</a>
     </div>
   </header>
 
@@ -35,87 +38,92 @@
       </div>
     </section>
 
-    <section class="section rsvp" id="rsvp" aria-labelledby="rsvp-title">
+    <section class="section rsvp" id="request" aria-labelledby="request-title">
       <div class="wrap narrow">
-        <h2 id="rsvp-title">Join me</h2>
-        <p class="sub">Tell me what sounds good. I'll reach out to set dates.</p>
+        <h2 id="request-title">Request a reservation</h2>
+        <p class="sub">
+          This is a request, not a booking. I read every one and reply to you
+          myself. Choose dates between <span data-date="earliest">January 1, 2027</span>
+          and <span data-date="end">February 20, 2028</span>.
+        </p>
 
-        <form id="rsvp-form" novalidate>
+        <form id="request-form" method="POST" novalidate>
+          <!-- Each field is its own block: add, remove, or rename one at a time.
+               The name="" is the label Formspree shows in the email. -->
+
+          <!-- 1. Full name -->
           <div class="field">
-            <label for="name">Your name</label>
+            <label for="name">Full name</label>
             <input id="name" name="name" type="text" autocomplete="name" required>
           </div>
 
+          <!-- 2. Email -->
           <div class="field">
-            <label for="contact">Email or phone number</label>
-            <input id="contact" name="contact" type="text" autocomplete="email" required>
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" required>
           </div>
 
-          <fieldset class="field">
-            <legend>Best way to reach you</legend>
-            <div class="choices">
-              <label><input type="checkbox" name="reach" value="Text"> Text</label>
-              <label><input type="checkbox" name="reach" value="Email"> Email</label>
-              <label><input type="checkbox" name="reach" value="Phone call"> Phone call</label>
-            </div>
-          </fieldset>
+          <!-- 3. Phone -->
+          <div class="field">
+            <label for="phone">Phone <span class="optional">(optional)</span></label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel">
+          </div>
+
+          <!-- 4. Relationship -->
+          <div class="field">
+            <label for="relationship">How do you know Tommy? <span class="optional">(optional)</span></label>
+            <input id="relationship" name="relationship" type="text">
+          </div>
 
           <div class="row">
+            <!-- 5. Start date -->
             <div class="field">
-              <label for="who">Who's coming?</label>
-              <select id="who" name="who">
-                <option>Just me</option>
-                <option>Me and a partner</option>
-                <option>My family</option>
-                <option>A group</option>
-              </select>
+              <label for="start_date">Preferred start date</label>
+              <input id="start_date" name="start_date" type="date" required>
             </div>
+
+            <!-- 6. End date -->
             <div class="field">
-              <label for="size">How many people, counting you?</label>
-              <input id="size" name="size" type="number" min="1" max="30" value="1" inputmode="numeric">
+              <label for="end_date">Preferred end date</label>
+              <input id="end_date" name="end_date" type="date" required>
             </div>
           </div>
 
-          <fieldset class="field">
-            <legend>Which adventures interest you?</legend>
-            <div class="choices" id="activity-choices"></div>
-          </fieldset>
-
+          <!-- 7. Flexible dates -->
           <div class="field">
-            <label class="inline"><input type="checkbox" name="host" value="Yes"> I'd like to host you at my place</label>
+            <label for="dates_flexible">Are your dates flexible?</label>
+            <select id="dates_flexible" name="dates_flexible">
+              <option>Yes</option>
+              <option>Somewhat</option>
+              <option>No, these dates only</option>
+            </select>
           </div>
 
+          <!-- 8. Adventure -->
           <div class="field">
-            <label for="teach">Something you could teach me <span class="optional">(optional)</span></label>
-            <input id="teach" name="teach" type="text">
+            <label for="adventure">Where / what adventure are you proposing?</label>
+            <textarea id="adventure" name="adventure" rows="4" required></textarea>
           </div>
 
+          <!-- 9. Group size -->
           <div class="field">
-            <label for="project">A project we could finish together <span class="optional">(optional)</span></label>
-            <textarea id="project" name="project" rows="3"></textarea>
+            <label for="group_size">How many people? <span class="optional">(optional)</span></label>
+            <input id="group_size" name="group_size" type="number" min="1" step="1" inputmode="numeric">
           </div>
 
+          <!-- 10. Notes -->
           <div class="field">
-            <label for="trip">Pitch me a trip overseas <span class="optional">(optional)</span></label>
-            <textarea id="trip" name="trip" rows="3"></textarea>
-          </div>
-
-          <div class="field">
-            <label for="notes">Anything else <span class="optional">(optional)</span></label>
+            <label for="notes">Anything else Tommy should know? <span class="optional">(optional)</span></label>
             <textarea id="notes" name="notes" rows="3"></textarea>
           </div>
 
-          <!-- Spam trap: people never see this, bots fill it in. -->
+          <!-- Hidden: email subject (set from config.js) and spam trap. -->
+          <input type="hidden" name="_subject" id="subject">
           <input type="text" name="_gotcha" class="trap" tabindex="-1" autocomplete="off" aria-hidden="true">
 
           <p class="status" id="status" role="status" aria-live="polite"></p>
-          <button class="button" type="submit">Send my RSVP</button>
+          <button class="button" type="submit">Request reservation</button>
         </form>
-
-        <div class="thanks" id="thanks" hidden tabindex="-1">
-          <h3>Got it. Thank you.</h3>
-          <p>I'll be in touch to set dates. I'm glad you're in.</p>
-        </div>
       </div>
     </section>
   </main>
@@ -134,7 +142,7 @@
     <h3 id="detail-title"></h3>
     <div id="detail-body"></div>
     <p id="detail-link"></p>
-    <button class="button" id="detail-rsvp" type="button">I'm in. Take me to the RSVP</button>
+    <button class="button" id="detail-rsvp" type="button">I'm in. Start my request</button>
   </dialog>
 </body>
 </html>

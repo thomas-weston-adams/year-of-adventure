@@ -141,15 +141,18 @@ input[type=text], input[type=number], select, textarea {
   border-radius: .6rem;
   padding: .7rem .85rem;
 }
-.choices { display: grid; gap: .35rem; }
-.choices label, label.inline { font-weight: 400; display: flex; align-items: center; gap: .6rem; }
-input[type=checkbox] { width: 1.15rem; height: 1.15rem; accent-color: var(--accent); }
 .trap { position: absolute; left: -9999px; }
 .status { min-height: 1.6em; color: var(--muted); }
-.thanks { padding: 2rem; border: 1px solid var(--accent); border-radius: 1rem; text-align: center; }
 
 .footer { padding: 2rem 0 3rem; text-align: center; color: var(--muted); font-size: .95rem; }
 
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; scroll-behavior: auto !important; }
+}
+
+.status.error { color: var(--focus); font-weight: 600; }
+[aria-invalid="true"] { border-color: var(--focus) !important; }
+input[type=email], input[type=tel], input[type=date] {
+  width: 100%; font: inherit; color: inherit; background: var(--bg);
+  border: 1px solid var(--line); border-radius: .6rem; padding: .7rem .85rem;
 }

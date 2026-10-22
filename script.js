@@ -1,13 +1,4 @@
-// ---- Settings: fill these in -------------------------------------------
-// Formspree form URL, e.g. "https://formspree.io/f/abcdwxyz".
-// Until it's set, the form says RSVPs aren't open yet instead of failing.
-const FORM_ENDPOINT = "";
-// Your own profile/booking links. Leave "" to hide the button.
-const STRAVA_URL = "https://strava.app.link/KvabRccdW0b";
-const CALENDAR_URL = "";
-// The first day of the running streak counts as day 1.
-const STREAK_START = "2018-10-15";
-// -------------------------------------------------------------------------
+// Settings live in config.js. This file reads them; don't edit values here.
 
 const EFFORT = { 1: "Low-key", 2: "Active", 3: "Committed", 4: "Expedition" };
 
@@ -19,9 +10,9 @@ const activities = [
     summary: "Let's have each other over. Dinner, a bonfire, time to catch up.",
     body: [
       "Sometimes the best adventure is at home. Let's visit each other's places, share a meal, sit around a fire, or just catch up with nowhere to be.",
-      "If you'd like to host me, say so in the RSVP and suggest a few dates.",
+      "If you'd like to host me, say so in your request and suggest some dates.",
     ],
-    link: () => CALENDAR_URL && { text: "Suggest dates on my calendar", url: CALENDAR_URL },
+    link: () => CONFIG.calendarUrl && { text: "Suggest dates on my calendar", url: CONFIG.calendarUrl },
   },
   {
     id: "teach",
@@ -42,7 +33,7 @@ const activities = [
       "I've run every day since October 2018. I don't mention it to impress anyone. I mention it because it means you always know where I'll be for about an hour a day: outside, in any weather.",
       "On weekdays I try to run right after work, before dark. Run with me, or meet me where I finish and we'll hang out after.",
     ],
-    link: () => STRAVA_URL && { text: "Follow my miles on Strava", url: STRAVA_URL },
+    link: () => CONFIG.stravaUrl && { text: "Follow my miles on Strava", url: CONFIG.stravaUrl },
   },
   {
     id: "project",
@@ -86,11 +77,27 @@ const activities = [
   },
 ];
 
+const $ = (id) => document.getElementById(id);
+
+// ---- Dates from CONFIG --------------------------------------------------
+
+const earliest = CONFIG.allowEarlierSubmissions ? CONFIG.earlierStartDate : CONFIG.startDate;
+const latest = CONFIG.endDate;
+
+// "2027-01-01" -> "January 1, 2027", without time-zone drift.
+function longDate(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+}
+
+for (const el of document.querySelectorAll("[data-date=start]")) el.textContent = longDate(CONFIG.startDate);
+for (const el of document.querySelectorAll("[data-date=end]")) el.textContent = longDate(CONFIG.endDate);
+for (const el of document.querySelectorAll("[data-date=earliest]")) el.textContent = longDate(earliest);
+
 // ---- Cards & detail dialog ----------------------------------------------
 
-const cards = document.getElementById("cards");
-const choices = document.getElementById("activity-choices");
-const dialog = document.getElementById("detail");
+const cards = $("cards");
+const dialog = $("detail");
 let current = null;
 
 for (const a of activities) {
@@ -102,21 +109,17 @@ for (const a of activities) {
       <span class="card-summary">${a.summary}</span>
     </button>`;
   cards.append(li);
-
-  const label = document.createElement("label");
-  label.innerHTML = `<input type="checkbox" name="activities" value="${a.title}" data-id="${a.id}"> ${a.title}`;
-  choices.append(label);
 }
 
 cards.addEventListener("click", (e) => {
   const button = e.target.closest(".card");
   if (!button) return;
   current = activities.find((a) => a.id === button.dataset.id);
-  document.getElementById("detail-effort").textContent = `${current.effort} · ${EFFORT[current.effort]}`;
-  document.getElementById("detail-title").textContent = current.title;
-  document.getElementById("detail-body").innerHTML = current.body.map((p) => `<p>${p}</p>`).join("");
+  $("detail-effort").textContent = `${current.effort} · ${EFFORT[current.effort]}`;
+  $("detail-title").textContent = current.title;
+  $("detail-body").innerHTML = current.body.map((p) => `<p>${p}</p>`).join("");
   const link = current.link && current.link();
-  document.getElementById("detail-link").innerHTML = link
+  $("detail-link").innerHTML = link
     ? `<a href="${link.url}" target="_blank" rel="noopener">${link.text}</a>`
     : "";
   dialog.showModal();
@@ -127,70 +130,94 @@ dialog.addEventListener("click", (e) => {
   if (e.target === dialog) dialog.close();
 });
 
-document.getElementById("detail-rsvp").addEventListener("click", () => {
-  const box = choices.querySelector(`[data-id="${current.id}"]`);
-  if (box) box.checked = true;
+// "I'm in" starts the request with that adventure's name.
+$("detail-rsvp").addEventListener("click", () => {
+  const adventure = $("adventure");
+  if (!adventure.value.includes(current.title)) {
+    adventure.value = adventure.value ? `${adventure.value}\n${current.title}: ` : `${current.title}: `;
+  }
   dialog.close();
-  document.getElementById("rsvp").scrollIntoView({ behavior: "smooth" });
-  document.getElementById("name").focus({ preventScroll: true });
+  $("request").scrollIntoView({ behavior: "smooth" });
+  $("name").focus({ preventScroll: true });
 });
 
-// ---- Group size follows "who's coming" ----------------------------------
+// ---- Request form -------------------------------------------------------
 
-const who = document.getElementById("who");
-const size = document.getElementById("size");
-who.addEventListener("change", () => {
-  const n = Number(size.value) || 1;
-  if (who.value === "Just me") size.value = 1;
-  else if (who.value === "Me and a partner") size.value = 2;
-  else if (n < 3) size.value = 3;
+const form = $("request-form");
+const status = $("status");
+const start = $("start_date");
+const end = $("end_date");
+const formReady = CONFIG.formId && CONFIG.formId !== "YOUR_FORMSPREE_FORM_ID";
+
+form.action = `https://formspree.io/f/${CONFIG.formId}`;
+$("subject").value = CONFIG.subject;
+if (CONFIG.redirectUrl) {
+  const next = document.createElement("input");
+  Object.assign(next, { type: "hidden", name: "_next", value: CONFIG.redirectUrl });
+  form.append(next);
+}
+
+start.min = end.min = earliest;
+start.max = end.max = latest;
+// The end date can't be earlier than the chosen start date.
+start.addEventListener("change", () => {
+  end.min = start.value || earliest;
 });
 
-// ---- RSVP submit --------------------------------------------------------
+function problem(field, message) {
+  field.setAttribute("aria-invalid", "true");
+  field.setAttribute("aria-describedby", "status");
+  status.textContent = message;
+  status.classList.add("error");
+  field.focus();
+}
 
-const form = document.getElementById("rsvp-form");
-const status = document.getElementById("status");
+// Returns the first problem with the form, or null if it's ready to send.
+function check() {
+  for (const field of form.querySelectorAll("[aria-invalid]")) field.removeAttribute("aria-invalid");
+  status.classList.remove("error");
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  for (const id of ["name", "contact"]) {
-    const field = document.getElementById(id);
+  for (const field of form.querySelectorAll("[required]")) {
     if (!field.value.trim()) {
-      status.textContent = `Please fill in ${field.labels[0].textContent.toLowerCase()}.`;
-      field.focus();
-      return;
+      const label = field.labels[0].firstChild.textContent.trim();
+      return [field, `Please fill in "${label}".`];
     }
   }
-  if (!FORM_ENDPOINT) {
-    status.textContent = "RSVPs aren't open yet. Check back soon.";
+  if (!/^\S+@\S+\.\S+$/.test($("email").value.trim())) {
+    return [$("email"), "Please check your email address."];
+  }
+  for (const field of [start, end]) {
+    if (field.value < earliest) return [field, `Dates start on ${longDate(earliest)}.`];
+    if (field.value > latest) return [field, `Dates end on ${longDate(latest)}.`];
+  }
+  if (end.value < start.value) return [end, "The end date can't be before the start date."];
+  const size = $("group_size");
+  if (size.value && !(Number.isInteger(Number(size.value)) && Number(size.value) >= 1)) {
+    return [size, "Group size should be a whole number, 1 or more."];
+  }
+  return null;
+}
+
+form.addEventListener("submit", (e) => {
+  const found = check();
+  if (found) {
+    e.preventDefault();
+    problem(...found);
     return;
   }
-
-  const button = form.querySelector("button[type=submit]");
-  button.disabled = true;
-  status.textContent = "Sending…";
-  try {
-    const res = await fetch(FORM_ENDPOINT, {
-      method: "POST",
-      body: new FormData(form),
-      headers: { Accept: "application/json" },
-    });
-    if (!res.ok) throw new Error(res.status);
-    form.hidden = true;
-    const thanks = document.getElementById("thanks");
-    thanks.hidden = false;
-    thanks.focus();
-  } catch {
-    status.textContent = "That didn't go through. Please try again in a minute.";
-    button.disabled = false;
+  if (!formReady) {
+    e.preventDefault();
+    status.textContent = "Requests open soon. Check back in a few days.";
+    return;
   }
+  // Valid: the browser posts the form straight to Formspree.
+  status.textContent = "Sending…";
 });
 
 // ---- Running streak, counted in the visitor's own time zone ------------
 
-const [y, m, d] = STREAK_START.split("-").map(Number);
-const start = new Date(y, m - 1, d);
+const [y, m, d] = CONFIG.streakStart.split("-").map(Number);
+const streakStart = new Date(y, m - 1, d);
 const today = new Date();
 const midnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-const day = Math.round((midnight - start) / 86400000) + 1;
-document.getElementById("streak-day").textContent = day.toLocaleString();
+$("streak-day").textContent = (Math.round((midnight - streakStart) / 86400000) + 1).toLocaleString();
