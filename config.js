@@ -5,7 +5,7 @@ const CONFIG = {
   // Formspree form ID: the part after /f/ in https://formspree.io/f/xxxxxxxx
   // While this is still the placeholder, the form shows "opening soon"
   // and nothing is sent.
-  formId: "YOUR_FORMSPREE_FORM_ID",
+  formId: "xqperjek",
 
   // The window people can request dates in (YYYY-MM-DD).
   startDate: "2027-01-01",
