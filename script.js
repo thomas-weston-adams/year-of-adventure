@@ -167,15 +167,7 @@ const form = $("request-form");
 const status = $("status");
 const start = $("start_date");
 const end = $("end_date");
-const formReady = CONFIG.formId && CONFIG.formId !== "YOUR_FORMSPREE_FORM_ID";
-
-form.action = `https://formspree.io/f/${CONFIG.formId}`;
-$("subject").value = CONFIG.subject;
-if (CONFIG.redirectUrl) {
-  const next = document.createElement("input");
-  Object.assign(next, { type: "hidden", name: "_next", value: CONFIG.redirectUrl });
-  form.append(next);
-}
+const formReady = CONFIG.scriptUrl && CONFIG.scriptUrl !== "PASTE_YOUR_SCRIPT_URL_HERE";
 
 start.min = end.min = earliest;
 start.max = end.max = latest;
@@ -218,20 +210,41 @@ function check() {
   return null;
 }
 
-form.addEventListener("submit", (e) => {
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
   const found = check();
   if (found) {
-    e.preventDefault();
     problem(...found);
     return;
   }
   if (!formReady) {
-    e.preventDefault();
     status.textContent = "Requests open soon. Check back in a few days.";
     return;
   }
-  // Valid: the browser posts the form straight to Formspree.
+
+  const button = form.querySelector("button[type=submit]");
+  button.disabled = true;
   status.textContent = "Sending…";
+  try {
+    // URL-encoded body keeps this a "simple" request, so Google answers it
+    // without a CORS preflight.
+    const res = await fetch(CONFIG.scriptUrl, { method: "POST", body: new URLSearchParams(new FormData(form)) });
+    const result = await res.json();
+    if (!result.ok) throw new Error(result.error || "Not saved");
+  } catch (err) {
+    status.textContent = "That didn't go through. Please try again in a minute.";
+    status.classList.add("error");
+    button.disabled = false;
+    return;
+  }
+
+  if (CONFIG.redirectUrl) {
+    location.href = CONFIG.redirectUrl;
+    return;
+  }
+  form.hidden = true;
+  $("thanks").hidden = false;
+  $("thanks").focus();
 });
 
 // ---- Running streak, counted in the visitor's own time zone ------------

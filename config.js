@@ -2,10 +2,10 @@
 // SETTINGS FOR THE WHOLE SITE. Change things here; nowhere else.
 // ===========================================================================
 const CONFIG = {
-  // Formspree form ID: the part after /f/ in https://formspree.io/f/xxxxxxxx
+  // Google Apps Script web app URL (ends in /exec). See README for setup.
   // While this is still the placeholder, the form shows "opening soon"
   // and nothing is sent.
-  formId: "xqperjek",
+  scriptUrl: "PASTE_YOUR_SCRIPT_URL_HERE",
 
   // The window people can request dates in (YYYY-MM-DD).
   startDate: "2027-01-01",
@@ -16,11 +16,9 @@ const CONFIG = {
   allowEarlierSubmissions: false,
   earlierStartDate: "2026-10-21",
 
-  // Subject line of the email Formspree sends me.
-  subject: "New Year of Adventure reservation",
-
-  // Where people land after sending. "" = Formspree's own thank-you page.
-  // (A custom page needs a paid Formspree plan.)
+  // Where people go after sending. "" = a thank-you message on this page.
+  // (Email subjects and the confirmation wording live in
+  // google-apps-script/Code.gs, because Google sends those emails.)
   redirectUrl: "",
 
   // Instagram profile: the handle badge, "Follow along" button, and footer.

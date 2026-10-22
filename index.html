@@ -63,7 +63,7 @@
 
         <form id="request-form" method="POST" novalidate>
           <!-- Each field is its own block: add, remove, or rename one at a time.
-               The name="" is the label Formspree shows in the email. -->
+               The name="" must match a COLUMNS entry in google-apps-script/Code.gs. -->
 
           <!-- 1. Full name -->
           <div class="field">
@@ -131,13 +131,18 @@
             <textarea id="notes" name="notes" rows="3"></textarea>
           </div>
 
-          <!-- Hidden: email subject (set from config.js) and spam trap. -->
-          <input type="hidden" name="_subject" id="subject">
+          <!-- Hidden spam trap: people never see it, bots fill it in. -->
           <input type="text" name="_gotcha" class="trap" tabindex="-1" autocomplete="off" aria-hidden="true">
 
           <p class="status" id="status" role="status" aria-live="polite"></p>
           <button class="button" type="submit">Request reservation</button>
         </form>
+
+        <div class="thanks" id="thanks" hidden tabindex="-1">
+          <h3>Request sent.</h3>
+          <p>Thank you. A confirmation is on its way to your inbox, and I'll write back to you personally.</p>
+          <p class="thanks-small">No email in a few minutes? Check your spam folder.</p>
+        </div>
       </div>
     </section>
   </main>
