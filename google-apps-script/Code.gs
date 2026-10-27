@@ -61,6 +61,7 @@ const COLUMNS = [
   ["end_date", "End", "Preferred end"],
   ["dates_flexible", "Flexible?", "Dates flexible?"],
   ["adventure", "Adventure", "Adventure"],
+  ["tradition", "Tradition?", "Make it a tradition?"],
   ["group_size", "People", "How many people"],
   ["notes", "Notes", "Anything else"],
   ["status", "Status (mine)", null],
@@ -204,12 +205,18 @@ function eventDetails(d) {
   return `${SETTINGS.calendarNote}\n\nAdventure: ${adventure}`;
 }
 
+// "Yes, every year" on the form: the calendar event repeats annually.
+function yearly(d) {
+  return d.tradition.startsWith("Yes");
+}
+
 // All-day event from start to end. Calendars treat the end date as
 // exclusive, so the event runs to the day after end_date.
 function googleCalendarUrl(d) {
   return "https://calendar.google.com/calendar/render?action=TEMPLATE" +
     "&text=" + encodeURIComponent(SETTINGS.calendarTitle) +
     "&dates=" + compact(d.start_date) + "/" + compact(addDay(d.end_date)) +
+    (yearly(d) ? "&recur=" + encodeURIComponent("RRULE:FREQ=YEARLY") : "") +
     "&details=" + encodeURIComponent(eventDetails(d));
 }
 
@@ -226,6 +233,7 @@ function icsFile(d) {
     `DTSTAMP:${stamp}`,
     `DTSTART;VALUE=DATE:${compact(d.start_date)}`,
     `DTEND;VALUE=DATE:${compact(addDay(d.end_date))}`,
+    ...(yearly(d) ? ["RRULE:FREQ=YEARLY"] : []),
     `SUMMARY:${text(SETTINGS.calendarTitle)}`,
     `DESCRIPTION:${text(eventDetails(d))}`,
     "STATUS:TENTATIVE",
