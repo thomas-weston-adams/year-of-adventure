@@ -1,6 +1,7 @@
 // Settings live in config.js. This file reads them; don't edit values here.
 
-const EFFORT = { 1: "Easy", 2: "Active", 3: "Gritty", 4: "Epic" };
+// How much of your time each one takes.
+const EFFORT = { 1: "An evening", 2: "A day", 3: "A weekend", 4: "A trip" };
 
 const activities = [
   {
@@ -27,7 +28,7 @@ const activities = [
   {
     id: "run",
     title: "Run with me",
-    effort: 2,
+    effort: 1,
     summary: "One mile or ten. Pace doesn't matter. Showing up does.",
     body: [
       "I've run every day since October 2018. I don't mention it to impress anyone. I mention it because it means you always know where I'll be for about an hour a day: outside, in any weather.",
@@ -203,6 +204,8 @@ function check() {
     if (field.value > latest) return [field, `Dates end on ${longDate(latest)}.`];
   }
   if (end.value < start.value) return [end, "The end date can't be before the start date."];
+  const booked = firstTaken(start.value, end.value);
+  if (booked) return [start, `I'm already booked on ${longDate(booked)}. Pick other dates, or tell me in the notes if you're flexible.`];
   const size = $("group_size");
   if (size.value && !(Number.isInteger(Number(size.value)) && Number(size.value) >= 1)) {
     return [size, "Group size should be a whole number, 1 or more."];
@@ -251,6 +254,117 @@ form.addEventListener("submit", async (e) => {
   $("thanks").focus();
 });
 
+// ---- Date picker --------------------------------------------------------
+// A month calendar limited to the request window, with booked dates crossed
+// out. Tap a first day, then a last day. It fills in the two date fields,
+// which still work on their own.
+
+// Date -> "2027-01-01" in the visitor's own time zone.
+const isoDay = (date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+function parseDay(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function* eachDay(from, to) {
+  for (let date = parseDay(from); isoDay(date) <= to; date.setDate(date.getDate() + 1)) yield isoDay(date);
+}
+
+const taken = new Set(CONFIG.takenDates.flatMap(({ from, to }) => [...eachDay(from, to || from)]));
+
+// The first booked day between from and to, or null.
+function firstTaken(from, to) {
+  for (const day of eachDay(from, to)) if (taken.has(day)) return day;
+  return null;
+}
+
+const picker = $("date-picker");
+const grid = $("picker-grid");
+const hint = $("picker-hint");
+const firstOpen = earliest > isoDay(new Date()) ? earliest : isoDay(new Date());
+let view; // first of the month on screen
+let pickFrom = null;
+let pickTo = null;
+
+function say(text, isError = false) {
+  hint.textContent = text;
+  hint.classList.toggle("error", isError);
+}
+
+function renderPicker() {
+  $("picker-month").textContent = view.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  $("picker-prev").disabled = isoDay(view) <= firstOpen.slice(0, 8) + "01";
+  $("picker-next").disabled = isoDay(new Date(view.getFullYear(), view.getMonth() + 1, 1)) > latest;
+
+  const cells = ["S", "M", "T", "W", "T", "F", "S"].map((d) => `<span class="weekday" aria-hidden="true">${d}</span>`);
+  for (let i = 0; i < view.getDay(); i++) cells.push("<span></span>");
+  const month = view.getMonth();
+  for (let date = new Date(view); date.getMonth() === month; date.setDate(date.getDate() + 1)) {
+    const day = isoDay(date);
+    const isTaken = taken.has(day);
+    const outside = day < firstOpen || day > latest;
+    const selected = day === pickFrom || day === pickTo;
+    const between = pickFrom && pickTo && day > pickFrom && day < pickTo;
+    const classes = ["day", isTaken && "taken", selected && "endpoint", between && "in-range"].filter(Boolean).join(" ");
+    const label = longDate(day) + (isTaken ? ", already booked" : "");
+    cells.push(`<button type="button" class="${classes}" data-day="${day}" aria-label="${label}" aria-pressed="${selected}"${isTaken || outside ? " disabled" : ""}>${date.getDate()}</button>`);
+  }
+  grid.innerHTML = cells.join("");
+}
+
+$("pick-dates").addEventListener("click", () => {
+  pickFrom = start.value || null;
+  pickTo = end.value || null;
+  const shown = parseDay(pickFrom || firstOpen);
+  view = new Date(shown.getFullYear(), shown.getMonth(), 1);
+  say(pickFrom ? "Tap a new first day to start over." : "Tap your first day.");
+  renderPicker();
+  picker.showModal();
+});
+
+grid.addEventListener("click", (e) => {
+  const day = e.target.closest(".day")?.dataset.day;
+  if (!day) return;
+  if (!pickFrom || pickTo || day < pickFrom) {
+    pickFrom = day;
+    pickTo = null;
+    say("Now tap your last day. Tap the same day again for a single day.");
+  } else if (firstTaken(pickFrom, day)) {
+    say(`I'm already booked on ${longDate(firstTaken(pickFrom, day))}. Pick a shorter stretch.`, true);
+    return;
+  } else {
+    pickTo = day;
+    say(pickFrom === pickTo ? longDate(pickFrom) : `${longDate(pickFrom)} to ${longDate(pickTo)}`);
+  }
+  renderPicker();
+  grid.querySelector(`[data-day="${day}"]`).focus();
+});
+
+for (const [id, step] of [["picker-prev", -1], ["picker-next", 1]]) {
+  $(id).addEventListener("click", () => {
+    view = new Date(view.getFullYear(), view.getMonth() + step, 1);
+    renderPicker();
+  });
+}
+
+$("picker-done").addEventListener("click", () => {
+  if (!pickFrom) {
+    say("Tap your first day.", true);
+    return;
+  }
+  start.value = pickFrom;
+  end.value = pickTo || pickFrom;
+  end.min = start.value;
+  picker.close();
+  $("dates_flexible").focus();
+});
+
+picker.addEventListener("click", (e) => {
+  if (e.target === picker) picker.close();
+});
+
 // ---- Tentative calendar event on the thank-you screen ------------------
 // All-day, start to end. Calendars treat the end date as exclusive, so the
 // event runs to the day after end_date. "Yes, every year" repeats it yearly.
@@ -275,7 +389,7 @@ function setCalendarLinks() {
   const from = compact(start.value);
   const to = compact(addDay(end.value));
   const yearly = $("tradition").value.startsWith("Yes");
-  const details = `Not confirmed yet. Tommy will reply personally to lock in the details.\n\nAdventure: ${$("adventure").value.trim()}`;
+  const details = `Not confirmed yet. I'll write back to you personally to lock in the details. – Tommy\n\nAdventure: ${$("adventure").value.trim()}`;
 
   $("cal-google").href = "https://calendar.google.com/calendar/render?action=TEMPLATE" +
     "&text=" + encodeURIComponent(CAL_TITLE) +
