@@ -13,7 +13,7 @@ const CONFIG = {
     name: "entry.876262380",
     email: "entry.2097088348",
     phone: "entry.1149248532",
-    relationship: "entry.909235910",
+    met: "entry.909235910",
     start_date: "entry.1583002676",
     end_date: "entry.1295916346",
     dates_flexible: "entry.100632142",
@@ -26,6 +26,13 @@ const CONFIG = {
   // The window people can request dates in (YYYY-MM-DD).
   startDate: "2027-01-01",
   endDate: "2028-02-20", // my 45th birthday
+
+  // Dates I'm already booked. They show crossed out on the date picker,
+  // and requests that include them are turned back. One line per stretch
+  // (from and to can be the same day), e.g.
+  //   { from: "2027-07-04", to: "2027-07-05" },
+  takenDates: [
+  ],
 
   // Set to true to let people request dates before startDate,
   // as early as earlierStartDate.

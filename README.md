@@ -11,7 +11,7 @@ Plain HTML, CSS, and JavaScript. No build step. GitHub Pages serves it straight 
 | To change | Edit |
 |---|---|
 | Google Form address and field IDs, date window, earlier-dates toggle, redirect, Instagram/Strava/calendar links | **`config.js`** (the site's only settings file) |
-| Activity cards (titles, words, effort level) | the `activities` list at the top of `script.js` |
+| The before-45 list (titles, words, and how much time each takes: an evening, a day, a weekend, a trip) | the `activities` list at the top of `script.js` |
 | Form fields | `index.html`: each field is its own numbered block inside `<form id="request-form">` |
 | Colors and layout | `styles.css` |
 
@@ -41,6 +41,7 @@ Renaming or reordering questions on the Google Form is safe: the IDs don't chang
 ### Fields and safeguards
 
 - **Adding a field:** copy a numbered block in `index.html`, add a Short answer question to the Google Form, and add the pair to `formFields` in `config.js`. Mark it `required` in the HTML to make the site check it.
+- **Booked dates:** list them in `config.js → takenDates`. They show crossed out on the date picker, and the form turns back any request that includes one.
 - **Dates:** people can pick dates from `startDate` (or `earlierStartDate` when `allowEarlierSubmissions` is `true`) to `endDate`. The form also refuses an end date before the start date.
 - **Traditions:** the "Make it a tradition?" field. Pick "Yes, every year" and the tentative calendar event repeats every year, on the thank-you screen's calendar buttons. The "Put a stake in the ground" section in `index.html` explains why.
 - **Spam:** a hidden `_gotcha` field. Bots fill it in, and the site quietly doesn't send those.

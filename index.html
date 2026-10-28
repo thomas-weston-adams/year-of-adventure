@@ -45,8 +45,8 @@
       <div class="wrap">
         <h2 id="options-title">The before-45 list</h2>
         <p class="sub">
-          Pick one, or pick a few. Each is rated by how much it asks of you, from
-          1 (easy) to 4 (epic). Open any card for the details.
+          Pick one, or pick a few. Each is marked by how much of your time it
+          takes, from an evening to a trip. Tap one for the details.
         </p>
         <ul class="cards" id="cards"></ul>
       </div>
@@ -56,25 +56,17 @@
       <div class="wrap narrow">
         <h2 id="stake-title">Put a stake in the ground</h2>
         <p class="sub">
-          This year ends when I turn 45. The people don't. So here's the real ask:
-          pick something we'd both happily do again, name a date, and keep it.
-        </p>
-        <ol class="ladder">
-          <li><span class="ladder-year">Year one</span> We figure it out. Where, what to eat, who drives.</li>
-          <li><span class="ladder-year">Year two</span> We already know the plan.</li>
-          <li><span class="ladder-year">Year three</span> Nobody has to ask what to bring.</li>
-          <li><span class="ladder-year">Year four</span> You text me before I text you.</li>
-        </ol>
-        <p>
-          That's how a friendship gets a shape. Not one big trip we talk about forever.
-          The same good thing, on the same weekend, with the same faces, every year.
-          No outdoing last time. No new theme. Just showing up again.
+          The best things I do with people, I do again. Same trail, same table,
+          same weekend, every year.
         </p>
         <p>
-          The easy cards make the best traditions. A dinner I'll happily repeat
-          beats an epic I'll dread. When you send a request, tell me if you
-          want it to be the first of many. If you do, the calendar invite repeats
-          every year.
+          That's what I'm after here. Not one big trip we talk about forever, but
+          something good enough, and simple enough, that we'd both happily show up
+          for it next year too. No outdoing last time. No new theme. Just us, again.
+        </p>
+        <p>
+          So when you send a request, tell me if you want it to be the first of
+          many. If you do, your calendar invite repeats every year.
         </p>
       </div>
     </section>
@@ -106,15 +98,17 @@
 
           <!-- 3. Phone -->
           <div class="field">
-            <label for="phone">Phone <span class="optional">(optional)</span></label>
-            <input id="phone" name="phone" type="tel" autocomplete="tel">
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" required>
           </div>
 
-          <!-- 4. Relationship -->
+          <!-- 4. Security question (a joke, but I do want the answer) -->
           <div class="field">
-            <label for="relationship">How do you know Tommy? <span class="optional">(optional)</span></label>
-            <input id="relationship" name="relationship" type="text">
+            <label for="met">Security question: when did we meet? <span class="optional">(no wrong answers, mostly)</span></label>
+            <input id="met" name="met" type="text">
           </div>
+
+          <button class="button ghost-light pick-dates" id="pick-dates" type="button">Pick your dates on a calendar</button>
 
           <div class="row">
             <!-- 5. Start date -->
@@ -164,7 +158,7 @@
 
           <!-- 11. Notes -->
           <div class="field">
-            <label for="notes">Anything else Tommy should know? <span class="optional">(optional)</span></label>
+            <label for="notes">Anything else I should know? <span class="optional">(optional)</span></label>
             <textarea id="notes" name="notes" rows="3"></textarea>
           </div>
 
@@ -195,6 +189,22 @@
       <p>Follow along on Instagram: <a id="footer-ig" href="https://www.instagram.com/anythingbutmidlifecrisis/" target="_blank" rel="noopener">@anythingbutmidlifecrisis</a></p>
     </div>
   </footer>
+
+  <dialog id="date-picker" class="picker" aria-labelledby="picker-title">
+    <form method="dialog" class="close-row">
+      <button class="close" aria-label="Close">×</button>
+    </form>
+    <h3 id="picker-title">Pick your dates</h3>
+    <p class="picker-hint" id="picker-hint" aria-live="polite"></p>
+    <div class="picker-nav">
+      <button type="button" id="picker-prev" aria-label="Previous month">‹</button>
+      <span id="picker-month"></span>
+      <button type="button" id="picker-next" aria-label="Next month">›</button>
+    </div>
+    <div class="picker-grid" id="picker-grid"></div>
+    <p class="picker-legend"><span class="day taken" aria-hidden="true">7</span> Already booked</p>
+    <button class="button" id="picker-done" type="button">Use these dates</button>
+  </dialog>
 
   <dialog id="detail" aria-labelledby="detail-title">
     <form method="dialog" class="close-row">

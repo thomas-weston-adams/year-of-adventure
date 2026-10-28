@@ -193,25 +193,34 @@ dialog a { color: var(--accent); font-weight: 700; }
 .close { background: none; border: 0; color: var(--muted); font-size: 1.75rem; line-height: 1; padding: .25rem .6rem; cursor: pointer; border-radius: .5rem; }
 .close:hover { color: var(--text); }
 
-/* Stake in the ground: each rung of the ladder is one more year. */
+/* Stake in the ground */
 .stake { border-top: 1px solid var(--line); }
 .stake p:not(.sub) { margin: 0 0 1rem; }
-.ladder { list-style: none; margin: 0 0 1.75rem; padding: 0; display: grid; gap: .6rem; }
-.ladder li {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-left: 4px solid var(--pink);
-  border-radius: .6rem;
-  padding: .7rem 1rem;
+
+/* Date picker */
+.pick-dates { margin: 0 0 1rem; }
+.picker-hint { color: var(--muted); margin: 0 0 1rem; min-height: 1.6em; }
+.picker-hint.error { color: var(--error); font-weight: 600; }
+.picker-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: .5rem; font-weight: 700; }
+.picker-nav button {
+  background: none; border: 1px solid var(--line); border-radius: .5rem; color: inherit;
+  font-size: 1.4rem; line-height: 1; padding: .2rem .75rem; cursor: pointer;
 }
-.ladder li:nth-child(1) { margin-right: 3rem; }
-.ladder li:nth-child(2) { margin-right: 2rem; }
-.ladder li:nth-child(3) { margin-right: 1rem; }
-.ladder li:nth-child(4) { border-left-color: var(--purple); }
-.ladder-year {
-  display: block;
-  font-family: var(--display); font-size: 1.4rem; line-height: 1.1; letter-spacing: .03em;
+.picker-nav button:disabled { opacity: .3; cursor: default; }
+.picker-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: .25rem; margin-bottom: 1rem; }
+.weekday { text-align: center; font-size: .75rem; font-weight: 700; color: var(--muted); padding: .25rem 0; }
+.day {
+  aspect-ratio: 1; display: grid; place-items: center;
+  font: inherit; font-size: .95rem; color: inherit;
+  background: var(--bg); border: 1px solid var(--line); border-radius: .5rem; cursor: pointer;
 }
+.day:hover:not(:disabled) { border-color: var(--pink); }
+.day:disabled { opacity: .3; cursor: default; }
+.day.taken { opacity: 1; background: var(--e2); color: var(--muted); text-decoration: line-through; text-decoration-color: var(--pink); }
+.day.in-range { background: var(--e3); border-color: var(--e3); }
+.day.endpoint { background: linear-gradient(135deg, var(--button-from), var(--button-to)); color: #fff; border-color: transparent; }
+.picker-legend { display: flex; align-items: center; gap: .5rem; color: var(--muted); font-size: .9rem; margin: 0 0 1rem; }
+.picker-legend .day { width: 2rem; cursor: default; }
 
 /* Form */
 .rsvp { background: var(--surface); border-top: 1px solid var(--line); }
