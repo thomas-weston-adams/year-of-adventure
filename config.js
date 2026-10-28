@@ -7,20 +7,20 @@ const CONFIG = {
   formUrl: "https://docs.google.com/forms/d/e/1FAIpQLSfuBIAwx5hzCvCzgwI_QMgZKt1XBgscRZKbImCB9F9q8iNAHQ/formResponse",
 
   // Each field on this site -> its question's entry ID on the Google Form.
-  // Get them from the form's "Get pre-filled link". Until every one is
-  // filled in, the form shows "opening soon" and nothing is sent.
+  // Get them from the form's "Get pre-filled link" (see README). If one is
+  // blank, the form shows "opening soon" and nothing is sent.
   formFields: {
-    name: "",
-    email: "",
-    phone: "",
-    relationship: "",
-    start_date: "",
-    end_date: "",
-    dates_flexible: "",
-    adventure: "",
-    tradition: "",
-    group_size: "",
-    notes: "",
+    name: "entry.876262380",
+    email: "entry.2097088348",
+    phone: "entry.1149248532",
+    relationship: "entry.909235910",
+    start_date: "entry.1583002676",
+    end_date: "entry.1295916346",
+    dates_flexible: "entry.100632142",
+    adventure: "entry.866189965",
+    tradition: "entry.1097569822",
+    group_size: "entry.1215744535",
+    notes: "entry.1029957118",
   },
 
   // The window people can request dates in (YYYY-MM-DD).
