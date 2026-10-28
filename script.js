@@ -280,6 +280,19 @@ function firstTaken(from, to) {
   return null;
 }
 
+// Booked dates shown above the form, soonest first. Past ones drop off.
+{
+  const range = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric" });
+  const upcoming = CONFIG.takenDates
+    .map(({ from, to }) => ({ from, to: to || from }))
+    .filter(({ to }) => to >= isoDay(new Date()))
+    .sort((a, b) => (a.from < b.from ? -1 : 1));
+  $("booked").innerHTML = upcoming
+    .map(({ from, to }) => `<li>${from === to ? range.format(parseDay(from)) : range.formatRange(parseDay(from), parseDay(to))} <span class="tag">Booked</span></li>`)
+    .join("");
+  $("booked").hidden = upcoming.length === 0;
+}
+
 const picker = $("date-picker");
 const grid = $("picker-grid");
 const hint = $("picker-hint");

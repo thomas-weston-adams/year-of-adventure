@@ -80,6 +80,9 @@
           and <span data-date="end">February 20, 2028</span>.
         </p>
 
+        <!-- Filled in from takenDates in config.js; hidden when there are none. -->
+        <ul class="booked" id="booked" hidden></ul>
+
         <form id="request-form" method="POST" novalidate>
           <!-- Each field is its own block: add, remove, or rename one at a time.
                The name="" must match a key in formFields in config.js. -->

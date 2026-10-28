@@ -41,7 +41,7 @@ Renaming or reordering questions on the Google Form is safe: the IDs don't chang
 ### Fields and safeguards
 
 - **Adding a field:** copy a numbered block in `index.html`, add a Short answer question to the Google Form, and add the pair to `formFields` in `config.js`. Mark it `required` in the HTML to make the site check it.
-- **Booked dates:** list them in `config.js → takenDates`. They show crossed out on the date picker, and the form turns back any request that includes one.
+- **Booked dates:** list them in `config.js → takenDates`. They show above the request form marked "Booked" (past ones drop off), crossed out on the date picker, and the form turns back any request that includes one.
 - **Dates:** people can pick dates from `startDate` (or `earlierStartDate` when `allowEarlierSubmissions` is `true`) to `endDate`. The form also refuses an end date before the start date.
 - **Traditions:** the "Make it a tradition?" field. Pick "Yes, every year" and the tentative calendar event repeats every year, on the thank-you screen's calendar buttons. The "Put a stake in the ground" section in `index.html` explains why.
 - **Spam:** a hidden `_gotcha` field. Bots fill it in, and the site quietly doesn't send those.

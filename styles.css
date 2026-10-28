@@ -197,6 +197,18 @@ dialog a { color: var(--accent); font-weight: 700; }
 .stake { border-top: 1px solid var(--line); }
 .stake p:not(.sub) { margin: 0 0 1rem; }
 
+/* Booked dates above the form */
+.booked { list-style: none; margin: 0 0 2rem; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem; }
+.booked li {
+  display: flex; align-items: center; gap: .5rem;
+  background: var(--bg); border: 1px solid var(--line); border-radius: 999px;
+  padding: .35rem .5rem .35rem .9rem; font-weight: 600;
+}
+.booked .tag {
+  font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+  background: var(--e2); border-radius: 999px; padding: .15rem .55rem;
+}
+
 /* Date picker */
 .pick-dates { margin: 0 0 1rem; }
 .picker-hint { color: var(--muted); margin: 0 0 1rem; min-height: 1.6em; }
