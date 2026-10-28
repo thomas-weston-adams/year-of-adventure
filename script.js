@@ -167,7 +167,7 @@ const form = $("request-form");
 const status = $("status");
 const start = $("start_date");
 const end = $("end_date");
-const formReady = CONFIG.scriptUrl && CONFIG.scriptUrl !== "PASTE_YOUR_SCRIPT_URL_HERE";
+const formReady = Object.values(CONFIG.formFields).every(Boolean);
 
 start.min = end.min = earliest;
 start.max = end.max = latest;
@@ -226,11 +226,14 @@ form.addEventListener("submit", async (e) => {
   button.disabled = true;
   status.textContent = "Sending…";
   try {
-    // URL-encoded body keeps this a "simple" request, so Google answers it
-    // without a CORS preflight.
-    const res = await fetch(CONFIG.scriptUrl, { method: "POST", body: new URLSearchParams(new FormData(form)) });
-    const result = await res.json();
-    if (!result.ok) throw new Error(result.error || "Not saved");
+    // Google Forms doesn't let other sites read its reply ("no-cors"), so
+    // this can only catch a request that never left, like being offline.
+    // The spam trap stays here: a bot that fills it is never sent on.
+    if (!form.elements._gotcha.value) {
+      const body = new URLSearchParams();
+      for (const [field, entry] of Object.entries(CONFIG.formFields)) body.append(entry, form.elements[field].value.trim());
+      await fetch(CONFIG.formUrl, { method: "POST", mode: "no-cors", body });
+    }
   } catch (err) {
     status.textContent = "That didn't go through. Please try again in a minute.";
     status.classList.add("error");
@@ -242,10 +245,65 @@ form.addEventListener("submit", async (e) => {
     location.href = CONFIG.redirectUrl;
     return;
   }
+  setCalendarLinks();
   form.hidden = true;
   $("thanks").hidden = false;
   $("thanks").focus();
 });
+
+// ---- Tentative calendar event on the thank-you screen ------------------
+// All-day, start to end. Calendars treat the end date as exclusive, so the
+// event runs to the day after end_date. "Yes, every year" repeats it yearly.
+
+const CAL_TITLE = "Tentative: Adventure with Tommy";
+
+function addDay(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d + 1)).toISOString().slice(0, 10);
+}
+
+const compact = (iso) => iso.replace(/-/g, "");
+
+// Calendar files wrap lines at 75 characters; continuation lines start with a space.
+function fold(line) {
+  const parts = [];
+  for (let i = 0; i < line.length; i += i === 0 ? 75 : 74) parts.push(line.slice(i, i + (i === 0 ? 75 : 74)));
+  return parts.join("\r\n ");
+}
+
+function setCalendarLinks() {
+  const from = compact(start.value);
+  const to = compact(addDay(end.value));
+  const yearly = $("tradition").value.startsWith("Yes");
+  const details = `Not confirmed yet. Tommy will reply personally to lock in the details.\n\nAdventure: ${$("adventure").value.trim()}`;
+
+  $("cal-google").href = "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+    "&text=" + encodeURIComponent(CAL_TITLE) +
+    "&dates=" + from + "/" + to +
+    (yearly ? "&recur=" + encodeURIComponent("RRULE:FREQ=YEARLY") : "") +
+    "&details=" + encodeURIComponent(details);
+
+  const text = (s) => s.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+  const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
+  const ics = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Anything But Midlife Crisis//Requests//EN",
+    "BEGIN:VEVENT",
+    `UID:${Date.now()}-${Math.random().toString(36).slice(2)}@anythingbutmidlifecrisis`,
+    `DTSTAMP:${stamp}`,
+    `DTSTART;VALUE=DATE:${from}`,
+    `DTEND;VALUE=DATE:${to}`,
+    ...(yearly ? ["RRULE:FREQ=YEARLY"] : []),
+    `SUMMARY:${text(CAL_TITLE)}`,
+    `DESCRIPTION:${text(details)}`,
+    "STATUS:TENTATIVE",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].map(fold).join("\r\n");
+  $("cal-ics").href = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
+  $("cal-yearly").hidden = !yearly;
+}
 
 // ---- Running streak, counted in the visitor's own time zone ------------
 

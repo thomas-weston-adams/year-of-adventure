@@ -10,47 +10,37 @@ Plain HTML, CSS, and JavaScript. No build step. GitHub Pages serves it straight 
 
 | To change | Edit |
 |---|---|
-| Google script URL, date window, earlier-dates toggle, redirect, Instagram/Strava/calendar links | **`config.js`** (the site's only settings file) |
-| Email subjects and the confirmation wording | the `SETTINGS` block at the top of **`google-apps-script/Code.gs`** |
+| Google Form address and field IDs, date window, earlier-dates toggle, redirect, Instagram/Strava/calendar links | **`config.js`** (the site's only settings file) |
 | Activity cards (titles, words, effort level) | the `activities` list at the top of `script.js` |
 | Form fields | `index.html`: each field is its own numbered block inside `<form id="request-form">` |
 | Colors and layout | `styles.css` |
 
 ## The request form
 
-Requests go to a small Google Apps Script running on Tommy's Google account
-(tommy.futureleader@gmail.com). For each request it:
+The form on the site sends each request to a Google Form, **Year of Adventure Requests**, owned by thomas.weston.adams@gmail.com. Visitors never see the Google Form itself. Google then:
 
-1. adds a row to a Google Sheet,
-2. emails Tommy the details (hit **Reply** to answer the person directly),
-3. emails the person a confirmation: everything they sent, plus a tentative calendar event (a Google Calendar link and an `.ics` file for Apple/Outlook).
+1. adds a row to the linked Google Sheet,
+2. emails Tommy that a new response came in.
 
-It's free. Gmail allows about 100 emails a day from a script.
+After sending, the visitor's thank-you screen offers the dates as a tentative calendar event: an **Add to Google Calendar** button and an `.ics` file for Apple, Outlook, and others. The site builds both in the browser, so nothing else has to run.
 
-### One-time setup (on a computer is easiest)
+There's no confirmation email to the visitor yet. (An earlier version used a Google Apps Script for that, but Google blocked it at the permission step on both of Tommy's accounts.)
 
-1. Signed in as **tommy.futureleader@gmail.com**, open **sheets.new**. Name the sheet *Anything But Midlife Crisis - Requests*.
-2. In the sheet: **Extensions → Apps Script**.
-3. Delete what's in the editor. Paste in all of [`google-apps-script/Code.gs`](google-apps-script/Code.gs). Click **Save**.
-4. **Deploy → New deployment**. Click the gear next to "Select type" and choose **Web app**.
-   - Execute as: **Me**
-   - Who has access: **Anyone**
-   - Click **Deploy**.
-5. Google asks for permission. Pick your account. When it says *"Google hasn't verified this app"*, click **Advanced → Go to (project name) (unsafe) → Allow**. That warning is normal for a script you wrote for yourself.
-6. Copy the **Web app URL** (it ends in `/exec`) and paste it into `config.js → scriptUrl`.
+Edit the Google Form: https://docs.google.com/forms/d/19CzfECts2a1Ldoj-NsShfI09IxQ4jji_oUTQ58wvpV4/edit
 
-Until step 6 is done, the form shows "Requests open soon" and sends nothing.
+### Connecting the site to the form
 
-### Changing the email wording later
+Every site field needs its Google Form question's **entry ID** in `config.js → formFields`. Until all of them are filled in, the form shows "Requests open soon" and sends nothing. To find the IDs:
 
-Edit the `SETTINGS` block at the top of the script, click **Save**, then
-**Deploy → Manage deployments → ✏️ → Version: New version → Deploy**.
-The URL stays the same, so the site needs no change. Keep the copy in this repo in sync.
+1. Open the form editor. Click **⋮ → Get pre-filled link**.
+2. Type a different number into each question (1 for Name, 2 for Email, and so on). Click **Get link → Copy link**.
+3. The link contains `entry.123456=1`, `entry.789012=2`, and so on. Each number after `entry.` is that question's ID.
+
+Renaming or reordering questions on the Google Form is safe: the IDs don't change. **Deleting a question is not.** Its answers stop being saved, and Google gives no error. If you delete one, update `formFields` to match.
 
 ### Fields and safeguards
 
-- **Adding or renaming a field:** copy a numbered block in `index.html`, and add a matching entry to `COLUMNS` in `Code.gs` (then redeploy). Mark it `required` in the HTML to make the site check it.
+- **Adding a field:** copy a numbered block in `index.html`, add a Short answer question to the Google Form, and add the pair to `formFields` in `config.js`. Mark it `required` in the HTML to make the site check it.
 - **Dates:** people can pick dates from `startDate` (or `earlierStartDate` when `allowEarlierSubmissions` is `true`) to `endDate`. The form also refuses an end date before the start date.
-- **Traditions:** the "Make it a tradition?" field. Pick "Yes, every year" and the tentative calendar event repeats every year, in both the Google Calendar link and the `.ics` file. The "Put a stake in the ground" section in `index.html` explains why.
-- **Spam:** a hidden `_gotcha` field. Bots fill it in, and the script quietly ignores those.
-- **Inbox flooding:** anyone can type any address into a form, so the confirmation has no links, and one address gets at most one confirmation an hour.
+- **Traditions:** the "Make it a tradition?" field. Pick "Yes, every year" and the tentative calendar event repeats every year, on the thank-you screen's calendar buttons. The "Put a stake in the ground" section in `index.html` explains why.
+- **Spam:** a hidden `_gotcha` field. Bots fill it in, and the site quietly doesn't send those.
