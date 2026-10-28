@@ -8,6 +8,10 @@
  *      tentative calendar event (Google Calendar link and .ics file).
  *
  * Setup and redeploy steps are in the repo's README.
+ *
+ * @OnlyCurrentDoc  Ask Google for this one spreadsheet only, not every
+ * spreadsheet on the account. A narrower permission is less likely to be
+ * blocked when you authorize the script.
  */
 
 // ===========================================================================
