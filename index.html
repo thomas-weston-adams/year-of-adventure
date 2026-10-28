@@ -52,6 +52,33 @@
       </div>
     </section>
 
+    <section class="section stake" aria-labelledby="stake-title">
+      <div class="wrap narrow">
+        <h2 id="stake-title">Put a stake in the ground</h2>
+        <p class="sub">
+          This year ends when I turn 45. The people don't. So here's the real ask:
+          pick something we'd both happily do again, name a date, and keep it.
+        </p>
+        <ol class="ladder">
+          <li><span class="ladder-year">Year one</span> We figure it out. Where, what to eat, who drives.</li>
+          <li><span class="ladder-year">Year two</span> We already know the plan.</li>
+          <li><span class="ladder-year">Year three</span> Nobody has to ask what to bring.</li>
+          <li><span class="ladder-year">Year four</span> You text me before I text you.</li>
+        </ol>
+        <p>
+          That's how a friendship gets a shape. Not one big trip we talk about forever.
+          The same good thing, on the same weekend, with the same faces, every year.
+          No outdoing last time. No new theme. Just showing up again.
+        </p>
+        <p>
+          The easy cards make the best traditions. A dinner I'll happily repeat
+          beats an epic I'll dread. When you send a request, tell me if you
+          want it to be the first of many. If you do, the calendar invite repeats
+          every year.
+        </p>
+      </div>
+    </section>
+
     <section class="section rsvp" id="request" aria-labelledby="request-title">
       <div class="wrap narrow">
         <h2 id="request-title">Claim your adventure</h2>
@@ -119,13 +146,23 @@
             <textarea id="adventure" name="adventure" rows="4" required></textarea>
           </div>
 
-          <!-- 9. Group size -->
+          <!-- 9. Tradition -->
+          <div class="field">
+            <label for="tradition">Make it a tradition?</label>
+            <select id="tradition" name="tradition">
+              <option>Just this once</option>
+              <option>Yes, every year</option>
+              <option>Maybe. Let's see how year one goes</option>
+            </select>
+          </div>
+
+          <!-- 10. Group size -->
           <div class="field">
             <label for="group_size">How many people? <span class="optional">(optional)</span></label>
             <input id="group_size" name="group_size" type="number" min="1" step="1" inputmode="numeric">
           </div>
 
-          <!-- 10. Notes -->
+          <!-- 11. Notes -->
           <div class="field">
             <label for="notes">Anything else Tommy should know? <span class="optional">(optional)</span></label>
             <textarea id="notes" name="notes" rows="3"></textarea>

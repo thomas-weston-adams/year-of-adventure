@@ -51,5 +51,6 @@ The URL stays the same, so the site needs no change. Keep the copy in this repo 
 
 - **Adding or renaming a field:** copy a numbered block in `index.html`, and add a matching entry to `COLUMNS` in `Code.gs` (then redeploy). Mark it `required` in the HTML to make the site check it.
 - **Dates:** people can pick dates from `startDate` (or `earlierStartDate` when `allowEarlierSubmissions` is `true`) to `endDate`. The form also refuses an end date before the start date.
+- **Traditions:** the "Make it a tradition?" field. Pick "Yes, every year" and the tentative calendar event repeats every year, in both the Google Calendar link and the `.ics` file. The "Put a stake in the ground" section in `index.html` explains why.
 - **Spam:** a hidden `_gotcha` field. Bots fill it in, and the script quietly ignores those.
 - **Inbox flooding:** anyone can type any address into a form, so the confirmation has no links, and one address gets at most one confirmation an hour.
