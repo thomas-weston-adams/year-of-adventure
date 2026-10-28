@@ -2,10 +2,26 @@
 // SETTINGS FOR THE WHOLE SITE. Change things here; nowhere else.
 // ===========================================================================
 const CONFIG = {
-  // Google Apps Script web app URL (ends in /exec). See README for setup.
-  // While this is still the placeholder, the form shows "opening soon"
-  // and nothing is sent.
-  scriptUrl: "PASTE_YOUR_SCRIPT_URL_HERE",
+  // Requests go to a Google Form (owned by thomas.weston.adams@gmail.com),
+  // which saves them to a linked Sheet and emails Tommy. See README.
+  formUrl: "https://docs.google.com/forms/d/e/1FAIpQLSfuBIAwx5hzCvCzgwI_QMgZKt1XBgscRZKbImCB9F9q8iNAHQ/formResponse",
+
+  // Each field on this site -> its question's entry ID on the Google Form.
+  // Get them from the form's "Get pre-filled link". Until every one is
+  // filled in, the form shows "opening soon" and nothing is sent.
+  formFields: {
+    name: "",
+    email: "",
+    phone: "",
+    relationship: "",
+    start_date: "",
+    end_date: "",
+    dates_flexible: "",
+    adventure: "",
+    tradition: "",
+    group_size: "",
+    notes: "",
+  },
 
   // The window people can request dates in (YYYY-MM-DD).
   startDate: "2027-01-01",
@@ -16,9 +32,8 @@ const CONFIG = {
   allowEarlierSubmissions: false,
   earlierStartDate: "2026-10-21",
 
-  // Where people go after sending. "" = a thank-you message on this page.
-  // (Email subjects and the confirmation wording live in
-  // google-apps-script/Code.gs, because Google sends those emails.)
+  // Where people go after sending. "" = a thank-you message on this page,
+  // with buttons to add the dates to their calendar.
   redirectUrl: "",
 
   // Instagram profile: the handle badge, "Follow along" button, and footer.

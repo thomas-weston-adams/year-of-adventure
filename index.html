@@ -90,7 +90,7 @@
 
         <form id="request-form" method="POST" novalidate>
           <!-- Each field is its own block: add, remove, or rename one at a time.
-               The name="" must match a COLUMNS entry in google-apps-script/Code.gs. -->
+               The name="" must match a key in formFields in config.js. -->
 
           <!-- 1. Full name -->
           <div class="field">
@@ -177,8 +177,13 @@
 
         <div class="thanks" id="thanks" hidden tabindex="-1">
           <h3>Request sent.</h3>
-          <p>Thank you. A confirmation is on its way to your inbox, with a link to add your dates to your calendar as tentative. I'll write back to you personally to confirm.</p>
-          <p class="thanks-small">No email in a few minutes? Check your spam folder.</p>
+          <p>Thank you. I read every request myself, and I'll write back to you personally to confirm.</p>
+          <p>Hold the dates on your calendar as tentative until then:</p>
+          <p class="thanks-actions">
+            <a class="button" id="cal-google" href="#" target="_blank" rel="noopener">Add to Google Calendar</a>
+            <a class="button ghost-light" id="cal-ics" href="#" download="adventure-with-tommy.ics">Apple, Outlook &amp; others</a>
+          </p>
+          <p class="thanks-small" id="cal-yearly" hidden>You asked to make it a tradition, so the event repeats every year.</p>
         </div>
       </div>
     </section>
