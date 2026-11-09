@@ -8,12 +8,22 @@ const activities = [
     id: "home",
     title: "Dinners & hangouts at home",
     effort: 1,
-    summary: "Let's have each other over. Dinner, a bonfire, time to catch up.",
+    summary: "Let's have each other over. Dinner, a bonfire, time together.",
     body: [
-      "Sometimes the best adventure is at home. Let's visit each other's places, share a meal, sit around a fire, or just catch up with nowhere to be.",
+      "Sometimes the best adventure is at home. Let's visit each other's places, share a meal, sit around a fire, or just hang out with nowhere to be.",
       "If you'd like to host me, say so in your request and suggest some dates.",
     ],
     link: () => CONFIG.calendarUrl && { text: "Suggest dates on my calendar", url: CONFIG.calendarUrl },
+  },
+  {
+    id: "tag-along",
+    title: "Tag along",
+    effort: 1,
+    summary: "Errands, chores, the plans you already have. Bring me.",
+    body: [
+      "You don't have to make plans for me. Going to the grocery store, painting the spare room, picking up the kids, deciding what to wear on Friday? I'd like to come.",
+      "The ordinary stuff counts. Tell me what's already on your calendar and let me join in.",
+    ],
   },
   {
     id: "teach",
