@@ -355,6 +355,29 @@ grid.addEventListener("click", (e) => {
   grid.querySelector(`[data-day="${day}"]`).focus();
 });
 
+// Arrow keys move a day or a week, skipping booked days and changing
+// months as needed. Enter or Space picks the focused day (it's a button).
+const STEPS = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
+grid.addEventListener("keydown", (e) => {
+  const step = STEPS[e.key];
+  const from = e.target.closest(".day")?.dataset.day;
+  if (!step || !from) return;
+  e.preventDefault();
+  const date = parseDay(from);
+  for (let tries = 0; tries < 60; tries++) {
+    date.setDate(date.getDate() + step);
+    const day = isoDay(date);
+    if (day < firstOpen || day > latest) return;
+    if (taken.has(day)) continue;
+    if (date.getMonth() !== view.getMonth() || date.getFullYear() !== view.getFullYear()) {
+      view = new Date(date.getFullYear(), date.getMonth(), 1);
+      renderPicker();
+    }
+    grid.querySelector(`[data-day="${day}"]`).focus();
+    return;
+  }
+});
+
 for (const [id, step] of [["picker-prev", -1], ["picker-next", 1]]) {
   $(id).addEventListener("click", () => {
     view = new Date(view.getFullYear(), view.getMonth() + step, 1);
