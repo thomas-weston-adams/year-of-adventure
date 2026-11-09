@@ -24,9 +24,12 @@ The form on the site sends each request to a Google Form, **Year of Adventure Re
 
 After sending, the visitor's thank-you screen offers the dates as a tentative calendar event: an **Add to Google Calendar** button and an `.ics` file for Apple, Outlook, and others. The site builds both in the browser, so nothing else has to run.
 
-The site also sends the visitor's address in Google's own `emailAddress` field. With the Google Form set to **Settings → Responses → Collect email addresses: Responder input** and **Send responders a copy of their response: Always**, Google emails the visitor a copy of their request. That copy is the confirmation email. (An earlier version used a Google Apps Script for this, but Google blocked it at the permission step on both of Tommy's accounts.)
+There's no confirmation email to the visitor. Two ways to send one were tried and both failed:
 
-Don't switch email collection to **Verified**: that makes people sign in to Google, and requests from the site would stop arriving.
+- **Google Apps Script:** Google blocked it at the permission step on both of Tommy's accounts.
+- **Google Forms' own "send responders a copy":** it only works with **Collect email addresses** turned on, and then Google rejects every request from the site. "Responder input" adds a robot check the site can't pass, and "Verified" requires a Google sign-in.
+
+**Keep the Google Form's Settings → Responses → Collect email addresses on "Do not collect,"** and keep "Send responders a copy" off. Any other setting silently breaks the site: visitors still see "Request sent," but nothing arrives.
 
 Edit the Google Form: https://docs.google.com/forms/d/19CzfECts2a1Ldoj-NsShfI09IxQ4jji_oUTQ58wvpV4/edit
 

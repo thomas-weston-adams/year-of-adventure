@@ -235,9 +235,6 @@ form.addEventListener("submit", async (e) => {
     if (!form.elements._gotcha.value) {
       const body = new URLSearchParams();
       for (const [field, entry] of Object.entries(CONFIG.formFields)) body.append(entry, form.elements[field].value.trim());
-      // Google Forms' own email field: with "Collect email addresses" set to
-      // Responder input, Google emails the person a copy of their request.
-      body.append("emailAddress", form.elements.email.value.trim());
       await fetch(CONFIG.formUrl, { method: "POST", mode: "no-cors", body });
     }
   } catch (err) {
