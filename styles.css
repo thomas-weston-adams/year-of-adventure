@@ -236,7 +236,10 @@ dialog a { color: var(--accent); font-weight: 700; }
 
 /* Form */
 .rsvp { background: var(--surface); border-top: 1px solid var(--line); }
-.field { margin: 0 0 1.25rem; border: 0; padding: 0; }
+.field { margin: 0 0 1.25rem; border: 0; padding: 0; min-width: 0; }
+.dates legend { font-weight: 700; font-size: 1.15rem; padding: 0; margin-bottom: .6rem; }
+.dates .row { gap: 1rem; }
+.dates .row .field { margin-bottom: 0; }
 .row { display: grid; gap: 0 1rem; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); }
 label { display: block; font-weight: 600; margin-bottom: .4rem; }
 .optional { font-weight: 400; color: var(--muted); }
